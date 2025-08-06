@@ -1,8 +1,9 @@
 import numpy as np
 import mediapipe as mp
 import cv2
-from typing import Tuple, Union
+import os
 import math
+from typing import Tuple, Union
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
@@ -14,24 +15,35 @@ FONT_THICKNESS = 1
 TEXT_COLOR = (255, 0, 0)  # Red for bounding box and text
 KEYPOINT_COLOR = (0, 255, 0)  # Green for keypoints
 
+# Model paths
+FACE_MODEL_PATH = './Models/blaze_face_short_range.tflite'
+HAND_MODEL_PATH = './Models/hand_landmarker.task'
+
+def check_model():
+    """Check if model files exist and provide download instructions if missing."""
+    if not os.path.exists(FACE_MODEL_PATH):
+        print(f"Error: Face model file '{FACE_MODEL_PATH}' does not exist.")
+        exit()
+    if not os.path.exists(HAND_MODEL_PATH):
+        print(f"Error: Hand model file '{HAND_MODEL_PATH}' does not exist.")
+        exit()
+
 try:
+    # Check model files
+    check_model()
+
     # Face Detector
-    model_file = open('./models/blaze_face_short_range.tflite', "rb")
-    model_data = model_file.read()
-    model_file.close()
-    base_options = python.BaseOptions(model_asset_buffer=model_data)
+    base_options = python.BaseOptions(model_asset_path=FACE_MODEL_PATH)
     options = vision.FaceDetectorOptions(base_options=base_options)
     face_detector = vision.FaceDetector.create_from_options(options)
 
     # Hand Detector
-    model_file = open('./models/hand_landmarker.task', "rb")
-    model_data = model_file.read()
-    model_file.close()
-    hand_base_options = python.BaseOptions(model_asset_buffer=model_data)
+    hand_base_options = python.BaseOptions(model_asset_path=HAND_MODEL_PATH)
     hand_options = vision.HandLandmarkerOptions(base_options=hand_base_options, num_hands=2)
     hand_detector = vision.HandLandmarker.create_from_options(hand_options)
 except Exception as e:
-    print(f"Error initializing FaceDetector: {e}")
+    print(f"Error initializing detectors: {e}")
+    print("Ensure model files are valid TFLite/task files and not corrupted. Re-download if necessary.")
     exit()
 
 # Webcam
@@ -170,6 +182,6 @@ try:
 except Exception as e:
     print(f"Error during processing: {e}")
 
-# Release resources when closed
+# Release resources
 cap.release()
 cv2.destroyAllWindows()
