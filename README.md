@@ -9,8 +9,8 @@
 ## 2. Clone atau Download Project dari GitHub
 - **Menggunakan Git:**
   ```bash
-  git clone https://github.com/username/nama-project.git
-  cd nama-project
+  git clone https://github.com/namx1/pydetection.git
+  cd pydetection
 
 - **Tanpa Git:**
   - Klik Code Lalu ***Download Zip***
